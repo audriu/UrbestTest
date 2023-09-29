@@ -29,3 +29,8 @@
                  :response-format (http/raw-response-format)
                  :on-success      [:issues-file-loaded]
                  :on-failure      [:loading-issues-file-failed]}}))
+
+(re-frame/reg-event-db
+ ::add-issue
+ (fn [db [_ new-issue]]
+   (update db :issues conj new-issue)))

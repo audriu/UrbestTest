@@ -3,6 +3,17 @@
    [re-frame.core :as re-frame]))
 
 (re-frame/reg-sub
- ::name
+ ::issues-loading
  (fn [db]
-   (:name db)))
+   (:issues-loading db)))
+
+(re-frame/reg-sub
+ ::all-issues
+ (fn [db]
+   (:issues db)))
+
+(re-frame/reg-sub
+ ::issues
+ :<- [::all-issues]
+ (fn [all-issues [_ type]]
+   (filter #(= (:status %) type) all-issues)))

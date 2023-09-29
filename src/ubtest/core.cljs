@@ -3,13 +3,10 @@
    [reagent.dom :as rdom]
    [re-frame.core :as re-frame]
    [ubtest.events :as events]
-   [ubtest.views :as views]
-   [ubtest.config :as config]
-   ))
-
+   [ubtest.views :as views]))
 
 (defn dev-setup []
-  (when config/debug?
+  (when ^boolean goog.DEBUG
     (println "dev mode")))
 
 (defn ^:dev/after-load mount-root []

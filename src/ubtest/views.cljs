@@ -7,37 +7,48 @@
    [ubtest.subs :as subs]))
 
 (defn card [issue]
-  [v-box
-   :style {:background-color "white"
-           :border "1px solid black"
-           :padding "10px"
-           :margin "10px"}
-   :gap "10px"
-   :children [[title
-               :src   (at)
-               :label (:title issue)
-               :level :level2]
-              [title
-               :src   (at)
-               :label (:building issue)
-               :level :level3]
-              [title
-               :src   (at)
-               :label (:category issue)
-               :level :level3]]])
+  (let [status (reagent/atom (:status issue))]
+    [v-box
+     :style {:background-color "white"
+             :border "1px solid black"
+             :padding "10px"
+             :margin "10px"}
+     :gap "10px"
+     :children [[title
+                 :src   (at)
+                 :label (:title issue)
+                 :level :level2]
+                [title
+                 :src   (at)
+                 :label (:building issue)
+                 :level :level3]
+                [title
+                 :src   (at)
+                 :label (:category issue)
+                 :level :level3]
+                [:div
+                 [:label {:for "status"} "Status: "]
+                 [:select {:id "status"
+                           :value @status
+                           :on-change #(do
+                                         (reset! status (-> % .-target .-value))
+                                         (re-frame/dispatch [::events/update-issue-status (:id issue) @status]))}
+                  [:option {:value "todo"} "To Do"]
+                  [:option {:value "in-progress"} "In Progress"]
+                  [:option {:value "done"} "Done"]]]]]))
 
-(defn column [type]
-  (let [issues (re-frame/subscribe [::subs/issues type])]
+(defn column [status]
+  (let [issues (re-frame/subscribe [::subs/issues status])]
     [:div
      [title
       :src   (at)
       :style {:margin-left "15px"}
-      :label (str (clojure.string/capitalize type) " (" (count @issues) ")")
+      :label (str (clojure.string/capitalize status) " (" (count @issues) ")")
       :level :level1]
      [v-box
       :style {:background-color "gray"}
       :height "100%"
-      :children (mapv (fn [issue] [card issue]) @issues)]]))
+      :children (mapv (fn [issue] [card (second issue)]) @issues)]]))
 
 (defn form-view []
   (let [title (reagent/atom "")
@@ -74,7 +85,8 @@
          [:option {:value "temperature"} "Temperature"]]]
        [:button {:on-click #(do
                               (re-frame/dispatch [::events/add-issue
-                                                  {:title @title
+                                                  {:id (js/Date.now)
+                                                   :title @title
                                                    :description @description
                                                    :building @building
                                                    :status "todo"

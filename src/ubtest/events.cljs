@@ -7,10 +7,11 @@
 (re-frame/reg-event-db
  :issues-file-loaded
  (fn [db [_ file-content]]
-   (-> db
-       (dissoc :issues-loading)
-       (dissoc :issues-loading-error)
-       (assoc :issues (edn/read-string file-content)))))
+   (let [data (into {} (map #(vector (:id %) %) (edn/read-string file-content)))]
+     (-> db
+         (dissoc :issues-loading)
+         (dissoc :issues-loading-error)
+         (assoc :issues data)))))
 
 ;;todo - right now, we just throw away the error
 (re-frame/reg-event-db
@@ -33,4 +34,9 @@
 (re-frame/reg-event-db
  ::add-issue
  (fn [db [_ new-issue]]
-   (update db :issues conj new-issue)))
+   (update db :issues conj {(:id new-issue) new-issue})))
+
+(re-frame/reg-event-db
+ ::update-issue-status
+ (fn [db [_ id status]]
+   (assoc-in db [:issues id :status] status)))

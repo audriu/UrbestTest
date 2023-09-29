@@ -15,5 +15,5 @@
 (re-frame/reg-sub
  ::issues
  :<- [::all-issues]
- (fn [all-issues [_ type]]
-   (filter #(= (:status %) type) all-issues)))
+ (fn [all-issues [_ status]]
+   (filter #(= (:status (second %)) status) all-issues)))

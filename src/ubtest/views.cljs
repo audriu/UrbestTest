@@ -31,7 +31,8 @@
     [:div
      [title
       :src   (at)
-      :label type
+      :style {:margin-left "15px"}
+      :label (str (clojure.string/capitalize type) " (" (count @issues) ")")
       :level :level1]
      [v-box
       :style {:background-color "gray"}

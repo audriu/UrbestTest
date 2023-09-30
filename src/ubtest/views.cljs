@@ -2,34 +2,50 @@
   (:require
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]
-   [re-com.core :refer [at h-box v-box title]]
+   [re-com.core :refer [at h-box v-box line title]]
    [ubtest.events :as events]
    [ubtest.subs :as subs]))
 
 (defn card [issue]
-  ;;todo match design of this card to the picture.
-  ;;todo show the description
-  ;;todo improve design of whole app
   (let [status (reagent/atom (:status issue))]
     [v-box
      :style {:background-color "white"
              :border "1px solid black"
+             :border-radius "5px"
              :padding "10px"
              :margin "10px"}
      :gap "10px"
      :children [[title
                  :src   (at)
-                 :label (:title issue)
+                 :label [:div {:style {:display "flex"
+                                       :width "100%"
+                                       :justify-content "space-between"}}
+                         [:span {:style {:color "violet"
+                                         :font-size "30px"}} "ƒ"]
+                         (:title issue)
+                         [:span {:style {:color "gray"
+                                         :font-size "30px"}} "Ⅷ"]]
                  :level :level2]
+                [title
+                 :src   (at)
+                 :label (:description issue)
+                 :level :level4]
                 [title
                  :src   (at)
                  :label (:building issue)
                  :level :level3]
-                [title
-                 :src   (at)
-                 :label (:category issue)
-                 :level :level3]
-                [:div
+                [h-box
+                 :gap      "10px"
+                 :children [[line
+                             :size  "3px"
+                             :color "red"]
+                            [title
+                             :src   (at)
+                             :label (:category issue)
+                             :level :level3]]]
+                [:div {:style {:text-color "gray"}}
+                 [:span {:style {:color "gray"
+                                 :font-size "30px"}} "§"]
                  [:label {:for "status"} "Status: "]
                  [:select {:id "status"
                            :value @status
@@ -49,7 +65,7 @@
       :label (str (clojure.string/capitalize status) " (" (count @issues) ")")
       :level :level1]
      [v-box
-      :style {:background-color "gray"}
+      :style {:background-color "lightgray"}
       :height "100%"
       :children (mapv (fn [issue] [card (second issue)]) @issues)]]))
 
@@ -59,7 +75,7 @@
         building (reagent/atom "")
         category (reagent/atom "cleaning")]
     (fn []
-      [:div
+      [:div {:style {:margin-top "100px"}}
        [:div
         [:label {:for "title"} "Title: "]
         [:input {:type "text"
@@ -126,7 +142,7 @@
            [:option {:value "electricity"} "Electricity"]
            [:option {:value "temperature"} "Temperature"]]])
        [h-box
-        :style {:background-color "lightgray"}
+        :style {:background-color "gray"}
         :height "100%"
         :gap "10px"
         :children [[column "todo"]

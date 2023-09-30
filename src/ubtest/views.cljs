@@ -7,6 +7,9 @@
    [ubtest.subs :as subs]))
 
 (defn card [issue]
+  ;;todo match design of this card to the picture.
+  ;;todo show the description
+  ;;todo improve design of whole app
   (let [status (reagent/atom (:status issue))]
     [v-box
      :style {:background-color "white"
@@ -105,6 +108,23 @@
        :label "Loading issues..."
        :level :level1]
       [:div
+       (let [search-text (re-frame/subscribe [::subs/search-text])
+             cathegory-to-show (re-frame/subscribe [::subs/category-to-show])]
+         [:div
+          [:label "Search: "]
+          [:input {:type "text"
+                   :value @search-text
+                   :on-change #(re-frame/dispatch [::events/set-search-text (-> % .-target .-value)])}]
+          [:label "Category to show: "]
+          [:select {:value @cathegory-to-show
+                    :on-change #(let [set-category-to-show (-> % .-target .-value)
+                                      set-category-to-show (if (= set-category-to-show "all") nil set-category-to-show)]
+                                  (re-frame/dispatch [::events/set-category-to-show set-category-to-show]))}
+           [:option {:value "all"} "All"]
+           [:option {:value "cleaning"} "Cleaning"]
+           [:option {:value "security"} "Security"]
+           [:option {:value "electricity"} "Electricity"]
+           [:option {:value "temperature"} "Temperature"]]])
        [h-box
         :style {:background-color "lightgray"}
         :height "100%"

@@ -40,3 +40,13 @@
  ::update-issue-status
  (fn [db [_ id status]]
    (assoc-in db [:issues id :status] status)))
+
+(re-frame/reg-event-db
+ ::set-search-text
+ (fn [db [_ text]]
+   (assoc db :search-text text)))
+
+(re-frame/reg-event-db
+ ::set-category-to-show
+ (fn [db [_ category]]
+   (assoc db :category-to-show category)))

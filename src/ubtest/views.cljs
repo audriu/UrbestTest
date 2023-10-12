@@ -1,60 +1,58 @@
 (ns ubtest.views
-  (:require
-   [reagent.core :as reagent]
-   [re-frame.core :as re-frame]
-   [re-com.core :refer [at h-box v-box line title]]
-   [ubtest.events :as events]
-   [ubtest.subs :as subs]))
+  (:require [clojure.string :as string]
+            [goog.string :as gstring]
+            [re-com.core :refer [at h-box line title v-box]]
+            [re-frame.core :as re-frame]
+            [reagent.core :as reagent]
+            [ubtest.events :as events]
+            [ubtest.subs :as subs]))
 
 (defn card [issue]
-  (let [status (reagent/atom (:status issue))]
-    [v-box
-     :style {:background-color "white"
-             :border "1px solid black"
-             :border-radius "5px"
-             :padding "10px"
-             :margin "10px"}
-     :gap "10px"
-     :children [[title
-                 :src   (at)
-                 :label [:div {:style {:display "flex"
-                                       :width "100%"
-                                       :justify-content "space-between"}}
-                         [:span {:style {:color "violet"
-                                         :font-size "30px"}} "ƒ"]
-                         (:title issue)
-                         [:span {:style {:color "gray"
-                                         :font-size "30px"}} "Ⅷ"]]
-                 :level :level2]
-                [title
-                 :src   (at)
-                 :label (:description issue)
-                 :level :level4]
-                [title
-                 :src   (at)
-                 :label (:building issue)
-                 :level :level3]
-                [h-box
-                 :gap      "10px"
-                 :children [[line
-                             :size  "3px"
-                             :color "red"]
-                            [title
-                             :src   (at)
-                             :label (:category issue)
-                             :level :level3]]]
-                [:div {:style {:text-color "gray"}}
-                 [:span {:style {:color "gray"
-                                 :font-size "30px"}} "§"]
-                 [:label {:for "status"} "Status: "]
-                 [:select {:id "status"
-                           :value @status
-                           :on-change #(do
-                                         (reset! status (-> % .-target .-value))
-                                         (re-frame/dispatch [::events/update-issue-status (:id issue) @status]))}
-                  [:option {:value "todo"} "To Do"]
-                  [:option {:value "in-progress"} "In Progress"]
-                  [:option {:value "done"} "Done"]]]]]))
+  [v-box
+   :style {:background-color "white"
+           :border "1px solid black"
+           :border-radius "5px"
+           :padding "10px"
+           :margin "10px"}
+   :gap "10px"
+   :children [[title
+               :src   (at)
+               :label [:div {:style {:display "flex"
+                                     :width "100%"
+                                     :justify-content "space-between"}}
+                       [:span {:style {:color "violet"
+                                       :font-size "30px"}} "ƒ"]
+                       (:title issue)
+                       [:span {:style {:color "gray"
+                                       :font-size "30px"}} "Ⅷ"]]
+               :level :level2]
+              [title
+               :src   (at)
+               :label (:description issue)
+               :level :level4]
+              [title
+               :src   (at)
+               :label (:building issue)
+               :level :level3]
+              [h-box
+               :gap      "10px"
+               :children [[line
+                           :size  "3px"
+                           :color "red"]
+                          [title
+                           :src   (at)
+                           :label (:category issue)
+                           :level :level3]]]
+              [:div {:style {:text-color "gray"}}
+               [:span {:style {:color "gray"
+                               :font-size "30px"}} "§"]
+               [:label {:for "status"} "Status: "]
+               [:select {:id "status"
+                         :value (:status issue)
+                         :on-change #(re-frame/dispatch [::events/update-issue-status (:id issue) (-> % .-target .-value)])}
+                [:option {:value "todo"} "To Do"]
+                [:option {:value "in-progress"} "In Progress"]
+                [:option {:value "done"} "Done"]]]]])
 
 (defn column [status]
   (let [issues (re-frame/subscribe [::subs/issues status])]
@@ -62,7 +60,7 @@
      [title
       :src   (at)
       :style {:margin-left "15px"}
-      :label (str (clojure.string/capitalize status) " (" (count @issues) ")")
+      :label (str (string/capitalize status) " (" (count @issues) ")")
       :level :level1]
      [v-box
       :style {:background-color "lightgray"}
@@ -104,7 +102,7 @@
          [:option {:value "temperature"} "Temperature"]]]
        [:button {:on-click #(do
                               (re-frame/dispatch [::events/add-issue
-                                                  {:id (js/Date.now)
+                                                  {:id (gstring/createUniqueString)
                                                    :title @title
                                                    :description @description
                                                    :building @building

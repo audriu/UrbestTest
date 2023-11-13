@@ -60,7 +60,7 @@
      [title
       :src   (at)
       :style {:margin-left "15px"}
-      :label (str (string/capitalize status) " (" (count @issues) ")")
+      :label (format "%s (%d)" (string/capitalize status) (count @issues))
       :level :level1]
      [v-box
       :style {:background-color "lightgray"}
